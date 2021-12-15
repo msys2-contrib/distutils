@@ -88,7 +88,8 @@ class CheckThread(threading.Thread):
     def __bool__(self):
         return not self.exc_info
 
-
+@unittest.skipIf(os.name == 'nt' and 'gcc' in sys.version.lower(), \
+    "Can't run with modified path on MinGW python.")
 class TestSpawn(unittest.TestCase):
     def test_concurrent_safe(self):
         """
