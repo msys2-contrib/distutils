@@ -65,6 +65,8 @@ def _python_build():
     return _is_python_source_dir(project_base)
 
 python_build = _python_build()
+posix_build = os.name == 'posix' or \
+        (sysconfig.get_platform().startswith('mingw'))
 
 
 # Calculate the build qualifier flags if they are defined.  Adding the flags
@@ -100,7 +102,7 @@ def get_python_inc(plat_specific=0, prefix=None):
     """
     if prefix is None:
         prefix = plat_specific and BASE_EXEC_PREFIX or BASE_PREFIX
-    if os.name == "posix":
+    if posix_build:
         if IS_PYPY and sys.version_info < (3, 8):
             return os.path.join(prefix, 'include')
         if python_build:
@@ -169,7 +171,7 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
         else:
             prefix = plat_specific and EXEC_PREFIX or PREFIX
 
-    if os.name == "posix":
+    if posix_build:
         if plat_specific or standard_lib:
             # Platform-specific modules (any module from a non-pure-Python
             # module distribution) or standard Python library modules.
@@ -199,7 +201,7 @@ def customize_compiler(compiler):
     Mainly needed on Unix, so we can plug in the information that
     varies across Unices and is stored in Python's Makefile.
     """
-    if compiler.compiler_type == "unix":
+    if compiler.compiler_type in ["unix", "cygwin", "mingw32"]:
         if sys.platform == "darwin":
             # Perform first-time customization of compiler-related
             # config vars on OS X now that we know we need a compiler.
@@ -271,7 +273,7 @@ def customize_compiler(compiler):
 def get_config_h_filename():
     """Return full pathname of installed pyconfig.h file."""
     if python_build:
-        if os.name == "nt":
+        if os.name == "nt" and not posix_build:
             inc_dir = os.path.join(_sys_home or project_base, "PC")
         else:
             inc_dir = _sys_home or project_base
