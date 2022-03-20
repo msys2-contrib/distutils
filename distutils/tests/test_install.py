@@ -67,6 +67,9 @@ class InstallTestCase(support.TempdirManager,
         check_path(cmd.install_scripts, os.path.join(destination, "bin"))
         check_path(cmd.install_data, destination)
 
+    @unittest.skipIf(os.name == 'nt' and 'gcc' in sys.version.lower(), \
+        "XXX: MinGW Python uses a different USER_BASE/SITE which doesn't "
+        "match the install scheme in distutils")
     def test_user_site(self):
         # test install with --user
         # preparing the environment for the test
