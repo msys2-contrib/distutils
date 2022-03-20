@@ -736,24 +736,12 @@ class build_ext(Command):
             # shared libraries are resolved at link time.
             from distutils.sysconfig import get_config_var
 
-            # Use self.plat_name as it works even in case of
-            # cross-compilation (at least for mingw build).
-            if self.plat_name.startswith('mingw'):
-                extra = []
-                for lib in (
-                    get_config_var('BLDLIBRARY').split()
-                    + get_config_var('SHLIBS').split()
-                    ):
-                    if lib.startswith('-l'):
-                        extra.append(lib[2:])
-                return ext.libraries + extra
-
             link_libpython = False
             if get_config_var('Py_ENABLE_SHARED'):
                 # A native build on an Android device or on Cygwin
                 if hasattr(sys, 'getandroidapilevel'):
                     link_libpython = True
-                elif sys.platform == 'cygwin':
+                elif sys.platform == 'cygwin' or self.plat_name.startswith('mingw'):
                     link_libpython = True
                 elif '_PYTHON_HOST_PLATFORM' in os.environ:
                     # We are cross-compiling for one of the relevant platforms
