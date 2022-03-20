@@ -93,6 +93,8 @@ def get_msvcr():
            return ['ucrt', 'vcruntime140'] 
         else:
             raise ValueError("Unknown MS Compiler version %s " % msc_ver)
+    else:
+        return []
 
 
 class CygwinCCompiler(UnixCCompiler):
@@ -136,7 +138,7 @@ class CygwinCCompiler(UnixCCompiler):
 
         # Include the appropriate MSVC runtime library if Python was built
         # with MSVC 7.0 or later.
-        self.dll_libraries = get_msvcr() or []
+        self.dll_libraries = get_msvcr()
 
     @property
     def gcc_version(self):
@@ -320,7 +322,7 @@ class Mingw32CCompiler(CygwinCCompiler):
 
         # Include the appropriate MSVC runtime library if Python was built
         # with MSVC 7.0 or later.
-        self.dll_libraries = get_msvcr() or []
+        self.dll_libraries = get_msvcr()
 
 # Because these compilers aren't configured in Python's pyconfig.h file by
 # default, we should at least warn the user if he is using an unmodified

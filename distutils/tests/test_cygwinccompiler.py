@@ -59,7 +59,7 @@ class CygwinCCompilerTestCase(support.TempdirManager,
         # none
         sys.version  = ('2.6.1 (r261:67515, Dec  6 2008, 16:42:21) '
                         '\n[GCC 4.0.1 (Apple Computer, Inc. build 5370)]')
-        self.assertEqual(get_msvcr(), None)
+        self.assertEqual(get_msvcr(), [])
 
         # MSVC 7.0
         sys.version = ('2.5.1 (r251:54863, Apr 18 2007, 08:51:08) '
