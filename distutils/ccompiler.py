@@ -18,7 +18,7 @@ from distutils.spawn import spawn
 from distutils.file_util import move_file
 from distutils.dir_util import mkpath
 from distutils.dep_util import newer_group
-from distutils.util import split_quoted, execute, get_platform
+from distutils.util import split_quoted, execute, is_mingw
 from distutils import log
 
 
@@ -1044,7 +1044,7 @@ def get_default_compiler(osname=None, platform=None):
         platform = sys.platform
     # Mingw is a special case where sys.platform is 'win32' but we
     # want to use the 'mingw32' compiler, so check it first
-    if platform == 'win32' and get_platform().startswith('mingw'):
+    if is_mingw():
         return 'mingw32'
     for pattern, compiler in _default_compilers:
         if (
