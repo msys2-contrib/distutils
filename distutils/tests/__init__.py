@@ -8,10 +8,12 @@ by import rather than matching pre-defined names.
 """
 
 import shutil
-from typing import Sequence
+from typing import Sequence, Optional
 
 
-def missing_compiler_executable(cmd_names: Sequence[str] = []):  # pragma: no cover
+def missing_compiler_executable(
+    cmd_names: Sequence[str] = [], compiler_type: Optional[str] = None
+):  # pragma: no cover
     """Check if the compiler components used to build the interpreter exist.
 
     Check for the existence of the compiler executables whose names are listed
@@ -22,7 +24,7 @@ def missing_compiler_executable(cmd_names: Sequence[str] = []):  # pragma: no co
     """
     from distutils import ccompiler, errors, sysconfig
 
-    compiler = ccompiler.new_compiler()
+    compiler = ccompiler.new_compiler(compiler=compiler_type)
     sysconfig.customize_compiler(compiler)
     if compiler.compiler_type == "msvc":
         # MSVC has no executables, so check whether initialization succeeds
@@ -40,3 +42,17 @@ def missing_compiler_executable(cmd_names: Sequence[str] = []):  # pragma: no co
             continue
         if shutil.which(cmd[0]) is None:
             return cmd[0]
+
+
+def get_possible_compiler_types() -> Sequence[str]:
+    """Returns a list of compiler types that could be used to build extensions
+    for the current interpreter.
+    """
+    from distutils import ccompiler
+
+    compiler_types = []
+    default_compiler_type = ccompiler.get_default_compiler()
+    compiler_types.append(default_compiler_type)
+    if default_compiler_type == "msvc":
+        compiler_types.append("mingw32")
+    return compiler_types

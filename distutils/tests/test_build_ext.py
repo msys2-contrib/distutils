@@ -18,7 +18,7 @@ from distutils.errors import (
     UnknownFileError,
 )
 from distutils.extension import Extension
-from distutils.tests import missing_compiler_executable
+from distutils.tests import missing_compiler_executable, get_possible_compiler_types
 from distutils.tests.support import (
     TempdirManager,
     copy_xxmodule_c,
@@ -90,8 +90,11 @@ class TestBuildExt(TempdirManager):
     def build_ext(self, *args, **kwargs):
         return build_ext(*args, **kwargs)
 
-    def test_build_ext(self):
-        missing_compiler_executable()
+    @pytest.mark.parametrize('compiler', get_possible_compiler_types())
+    def test_build_ext(self, compiler):
+        cmd = missing_compiler_executable(compiler_type=compiler)
+        if cmd is not None:
+            pytest.skip(f'The {cmd!r} command is not found')
         copy_xxmodule_c(self.tmp_dir)
         xx_c = os.path.join(self.tmp_dir, 'xxmodule.c')
         xx_ext = Extension('xx', [xx_c])
@@ -101,6 +104,7 @@ class TestBuildExt(TempdirManager):
         fixup_build_ext(cmd)
         cmd.build_lib = self.tmp_dir
         cmd.build_temp = self.tmp_dir
+        cmd.compiler = compiler
 
         old_stdout = sys.stdout
         if not support.verbose:
