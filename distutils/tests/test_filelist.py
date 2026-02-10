@@ -49,18 +49,22 @@ class TestFileList:
         if os.sep == '\\':
             sep = re.escape(os.sep)
 
+        # This changed between Python 3.13 and 3.14
+        end = glob_to_re('')[-2:]
+        assert end in (r'\z', r'\Z')
+
         for glob, regex in (
             # simple cases
-            ('foo*', r'(?s:foo[^%(sep)s]*)\Z'),
-            ('foo?', r'(?s:foo[^%(sep)s])\Z'),
-            ('foo??', r'(?s:foo[^%(sep)s][^%(sep)s])\Z'),
+            ('foo*', r'(?s:foo[^%(sep)s]*)%(end)s'),
+            ('foo?', r'(?s:foo[^%(sep)s])%(end)s'),
+            ('foo??', r'(?s:foo[^%(sep)s][^%(sep)s])%(end)s'),
             # special cases
-            (r'foo\\*', r'(?s:foo\\\\[^%(sep)s]*)\Z'),
-            (r'foo\\\*', r'(?s:foo\\\\\\[^%(sep)s]*)\Z'),
-            ('foo????', r'(?s:foo[^%(sep)s][^%(sep)s][^%(sep)s][^%(sep)s])\Z'),
-            (r'foo\\??', r'(?s:foo\\\\[^%(sep)s][^%(sep)s])\Z'),
+            (r'foo\\*', r'(?s:foo\\\\[^%(sep)s]*)%(end)s'),
+            (r'foo\\\*', r'(?s:foo\\\\\\[^%(sep)s]*)%(end)s'),
+            ('foo????', r'(?s:foo[^%(sep)s][^%(sep)s][^%(sep)s][^%(sep)s])%(end)s'),
+            (r'foo\\??', r'(?s:foo\\\\[^%(sep)s][^%(sep)s])%(end)s'),
         ):
-            regex = regex % {'sep': sep}
+            regex = regex % {'sep': sep, 'end': end}
             assert glob_to_re(glob) == regex
 
     def test_process_template_line(self):
