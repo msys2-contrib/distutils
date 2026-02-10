@@ -67,6 +67,7 @@ doc = [
 check = [
 	"pytest-checkdocs >= 2.4",
 	"pytest-ruff >= 0.2.1; sys_platform != 'cygwin'",
+	"ruff ~=0.14.0; sys_platform != 'cygwin'",
 ]
 
 cover = [
@@ -80,6 +81,7 @@ enabler = [
 type = [
 	# upstream
 	"pytest-mypy",
+	"mypy ~= 1.15.0",
 
 	# local
 	"types-docutils",
